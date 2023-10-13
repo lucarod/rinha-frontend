@@ -1,21 +1,38 @@
 import { useState } from 'react'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [ fileName, setFileName ] = useState("");
+  const [ jsonArray, setJsonArray ] = useState([]);
+
+  function readFile(event) {
+    const fileReader = new FileReader();
+    const { files } = event.target;
+
+    setFileName(files[0].name);
+
+    fileReader.readAsText(files[0], "UTF-8");
+    fileReader.onload = event => {
+      const content = event.target.result;
+      if (typeof content === "string") {
+        try {
+          const json = JSON.parse(content);
+          setJsonArray(json);
+        } catch (error) {
+          console.log(error);
+        }
+      } else {
+        console.log(typeof content);
+      }
+    };
+  }
+
+  console.log(fileName);
+  console.log(jsonArray);
 
   return (
     <>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <input type="file" accept='application/JSON' onChange={readFile} />
+      <p>{fileName}</p>
     </>
   )
 }
